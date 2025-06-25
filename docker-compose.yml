@@ -4,7 +4,7 @@ services:
     container_name: rabbitmq
     restart: always
     networks:
-      - ecommerce-network
+      - ecommerce-api-network
     ports:
       - 5672:5672
       - 15672:15672
@@ -13,10 +13,19 @@ services:
     environment:
       - RABBITMQ_DEFAULT_USER=admin
       - RABBITMQ_DEFAULT_PASS=admin
+  
+  eurekaserver:
+    build:
+      context: ./eurekaserver
+    image: eurekaserver
+    container_name: eurekaserver
+    ports:
+      - "8761:8761"
+    networks:
+      - ecommerce-api-network
 
 networks:
   ecommerce-api-network:
-    external: true
     driver: bridge
   
 volumes:
