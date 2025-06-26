@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: auth-microservice
+
+  config:
+    import: "optional:file:.env[.properties]"
+
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        jdbc:
+          lob:
+            non_contextual_creation: true
+    open-in-view: false
+
+server:
+  port: 0
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eurekaserver:8761/eureka
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}

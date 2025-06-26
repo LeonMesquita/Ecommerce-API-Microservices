@@ -24,6 +24,24 @@ services:
     networks:
       - ecommerce-api-network
 
+  clients:
+    build:
+      context: ./auth-microservice
+    image: auth-microservice
+    container_name: auth-microservice
+    depends_on:
+      - postgres-auth-microservice
+    env_file: ./auth-microservice/.env
+    networks:
+      - ecommerce-api-network
+
+  postgres-auth-microservice:
+    image: postgres:16
+    container_name: postgres-auth-microservice
+    env_file: ./auth-microservice/.env
+    networks:
+      - ecommerce-api-network
+
   cloud-gateway:
     build:
       context: ./cloud-gateway
