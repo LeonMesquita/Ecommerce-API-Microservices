@@ -24,7 +24,7 @@ services:
     networks:
       - ecommerce-api-network
 
-  clients:
+  auth-microservice:
     build:
       context: ./auth-microservice
     image: auth-microservice

@@ -19,7 +19,7 @@ public class CloudGatewayApplication {
 	public RouteLocator routes(RouteLocatorBuilder builder) {
 		return builder
 				.routes()
-//				.route(r -> r.path("/clients/**").uri("lb://clients"))
+				.route(r -> r.path("/auth/**").uri("lb://auth-microservice"))
 				.build();
 	}
 
