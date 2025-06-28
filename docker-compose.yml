@@ -32,6 +32,11 @@ services:
     depends_on:
       - postgres-auth-microservice
     env_file: ./auth-microservice/.env
+    volumes:
+      - ./auth-microservice:/app
+      
+    command: ["./mvnw", "spring-boot:run"]
+    # command: ./mvnw spring-boot:run
     networks:
       - ecommerce-api-network
 
@@ -41,6 +46,8 @@ services:
     env_file: ./auth-microservice/.env
     networks:
       - ecommerce-api-network
+    volumes:
+      - auth_microservice_db:/var/lib/postgresql/data
 
   cloud-gateway:
     build:
@@ -58,3 +65,4 @@ networks:
   
 volumes:
   rabbitmq_data:
+  auth_microservice_db:

@@ -25,7 +25,7 @@ public class UserModel {
     @Column(length = 50, nullable = false)
     private String name;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false, length = 50)
     private String email;
 
     @ElementCollection(fetch = FetchType.EAGER)
@@ -33,6 +33,10 @@ public class UserModel {
     @CollectionTable(name = "user_profile")
     @Column(name = "profile", nullable = false)
     private Set<Integer> profiles = new HashSet<>();
+
+    @Column(nullable = false)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private String password;
 
     public Set<ProfileEnum> getProfiles() {
         return this.profiles.stream().map(ProfileEnum::toEnum).collect(Collectors.toSet());
