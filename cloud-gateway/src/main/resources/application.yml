@@ -7,6 +7,11 @@ spring:
         locator:
           enabled: true
           lower-case-service-id: true
+  config:
+    import: "optional:file:.env[.properties]"
+
+  jwt:
+    secret: ${JWT_SECRET}
 
 server:
   port: 8080

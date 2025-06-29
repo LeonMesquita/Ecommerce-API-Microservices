@@ -20,6 +20,7 @@ public class CloudGatewayApplication {
 		return builder
 				.routes()
 				.route(r -> r.path("/auth/**").uri("lb://auth-microservice"))
+				.route(r -> r.path("/products/**").uri("lb://product-microservice"))
 				.build();
 	}
 

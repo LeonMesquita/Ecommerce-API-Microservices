@@ -49,11 +49,37 @@ services:
     volumes:
       - auth_microservice_db:/var/lib/postgresql/data
 
+
+  product-microservice:
+    build:
+      context: ./product-microservice
+    image: product-microservice
+    container_name: product-microservice
+    depends_on:
+      - postgres-product-microservice
+    env_file: ./product-microservice/.env
+    volumes:
+      - ./product-microservice:/app
+      
+    command: ["./mvnw", "spring-boot:run"]
+    networks:
+      - ecommerce-api-network
+  
+  postgres-product-microservice:
+    image: postgres:16
+    container_name: postgres-product-microservice
+    env_file: ./product-microservice/.env
+    networks:
+      - ecommerce-api-network
+    volumes:
+      - product_microservice_db:/var/lib/postgresql/data
+
   cloud-gateway:
     build:
       context: ./cloud-gateway
     image: cloud-gateway
     container_name: cloud-gateway
+    env_file: ./cloud-gateway/.env
     ports:
       - "8080:8080"
     networks:
@@ -66,3 +92,4 @@ networks:
 volumes:
   rabbitmq_data:
   auth_microservice_db:
+  product_microservice_db:
