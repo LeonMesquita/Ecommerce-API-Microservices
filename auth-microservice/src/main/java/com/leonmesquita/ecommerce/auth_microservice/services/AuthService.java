@@ -18,9 +18,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.security.core.GrantedAuthority;
 
+
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -61,24 +66,38 @@ public class AuthService {
                 new UsernamePasswordAuthenticationToken(dto.email(), dto.password());
         Authentication authentication = authenticationManager.authenticate(authToken);
         UserSpringSecurity user = (UserSpringSecurity) authentication.getPrincipal();
-        String accessToken = jwtUtil.generateToken(user.getUsername(), jwtUtil.getTokenExpirationHour());
-        String refreshToken = jwtUtil.generateToken(user.getUsername(), jwtUtil.getRefreshTokenExpirationHour());
+        List<String> roles = user.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
+        String accessToken = jwtUtil.generateToken(user.getUsername(), roles, jwtUtil.getTokenExpirationHour());
+        String refreshToken = jwtUtil.generateToken(user.getUsername(), roles, jwtUtil.getRefreshTokenExpirationHour());
 
         return new TokenResponseDTO(accessToken, refreshToken);
     }
 
-    public TokenResponseDTO refreshToken(RequestRefreshDTO dto) {
-        String refreshToken = dto.refreshToken();
-        if (refreshToken == null || refreshToken.isEmpty()) {
-            throw new GenericBadRequestException("Refresh token ausente");
-        }
-        String email = jwtUtil.isValidToken(refreshToken);
-        if (email.isEmpty()) {
-            throw new AuthorizationException("Refresh token inválido");
-        }
-        String newAccessToken = jwtUtil.generateToken(email, jwtUtil.getTokenExpirationHour());
-        String newRefreshToken = jwtUtil.generateToken(email, jwtUtil.getRefreshTokenExpirationHour());
-
-        return new TokenResponseDTO(newAccessToken, newRefreshToken);
-    }
+//    public TokenResponseDTO refreshToken(RequestRefreshDTO dto) {
+//        String refreshToken = dto.refreshToken();
+//        if (refreshToken == null || refreshToken.isEmpty()) {
+//            throw new GenericBadRequestException("Refresh token ausente");
+//        }
+//
+//        String email = jwtUtil.isValidToken(refreshToken);
+//        if (email.isEmpty()) {
+//            throw new AuthorizationException("Refresh token inválido");
+//        }
+//
+//        // Buscar o usuário para recuperar as roles
+//        UserModel user = userRepository.findByEmail(email)
+//                .orElseThrow(() -> new AuthorizationException("Usuário não encontrado"));
+//
+//        Collection<? extends GrantedAuthority> authorities = user.getProfiles().stream()
+//                .map(p -> new SimpleGrantedAuthority(p.getDescription()))
+//                .collect(Collectors.toSet());
+//
+//        String newAccessToken = jwtUtil.generateToken(email, authorities, jwtUtil.getTokenExpirationHour());
+//        String newRefreshToken = jwtUtil.generateToken(email, authorities, jwtUtil.getRefreshTokenExpirationHour());
+//
+//        return new TokenResponseDTO(newAccessToken, newRefreshToken);
+//    }
 }

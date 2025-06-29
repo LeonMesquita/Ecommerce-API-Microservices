@@ -23,7 +23,8 @@ public class JWTGatewayFilter implements GlobalFilter, Ordered {
             "/auth/login",
             "/v3/api-docs",
             "/swagger-ui",
-            "/swagger-ui.html"
+            "/swagger-ui.html",
+            "/products"
     );
 
     @Override
