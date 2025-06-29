@@ -20,7 +20,7 @@ public class ProductModel {
 
     @Column(length = 50)
     private String name;
-    
+
     @Column(length = 100)
     private String description;
 
@@ -32,4 +32,7 @@ public class ProductModel {
 
     @Column(length = 50)
     private String category;
+
+    @Column(nullable = false)
+    private boolean active = true;
 }
