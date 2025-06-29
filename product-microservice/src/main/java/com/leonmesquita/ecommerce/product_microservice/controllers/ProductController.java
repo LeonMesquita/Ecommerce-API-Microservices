@@ -5,6 +5,9 @@ import com.leonmesquita.ecommerce.product_microservice.models.ProductModel;
 import com.leonmesquita.ecommerce.product_microservice.services.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,8 +21,13 @@ public class ProductController {
     ProductService productService;
 
     @GetMapping
-    public ResponseEntity<String> getProducts() {
-        return ResponseEntity.ok("Produtos retornados");
+    public ResponseEntity<Page<ProductModel>> getProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy
+    ) {
+        Page<ProductModel> products = productService.findAll(PageRequest.of(page, size, Sort.by(sortBy)));
+        return ResponseEntity.status(HttpStatus.OK).body(products);
     }
 
     @PostMapping
@@ -27,4 +35,17 @@ public class ProductController {
     public ResponseEntity<ProductModel> createProduct(@RequestBody @Valid ProductDTO body) {
         return ResponseEntity.status(HttpStatus.CREATED).body(productService.save(body));
     }
+
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductModel> findProductById(@PathVariable Long id) {
+        return ResponseEntity.ok(productService.findById(id));
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PutMapping("/{id}")
+    public ResponseEntity<ProductModel> updateProduct(@PathVariable Long id, @RequestBody @Valid ProductDTO body) {
+        return ResponseEntity.ok(productService.update(id, body));
+    }
+
 }
