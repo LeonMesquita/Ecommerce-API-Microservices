@@ -36,7 +36,6 @@ services:
       - ./auth-microservice:/app
       
     command: ["./mvnw", "spring-boot:run"]
-    # command: ./mvnw spring-boot:run
     networks:
       - ecommerce-api-network
 

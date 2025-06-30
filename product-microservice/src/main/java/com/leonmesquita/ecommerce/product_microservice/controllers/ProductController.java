@@ -48,4 +48,11 @@ public class ProductController {
         return ResponseEntity.ok(productService.update(id, body));
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+        productService.delete(id);
+        return ResponseEntity.status(HttpStatus.OK).build();
+
+    }
 }
