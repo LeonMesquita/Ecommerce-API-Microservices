@@ -73,6 +73,30 @@ services:
     volumes:
       - product_microservice_db:/var/lib/postgresql/data
 
+  order-microservice:
+    build:
+      context: ./order-microservice
+    image: order-microservice
+    container_name: order-microservice
+    depends_on:
+      - postgres-order-microservice
+    env_file: ./order-microservice/.env
+    volumes:
+      - ./order-microservice:/app
+      
+    command: ["./mvnw", "spring-boot:run"]
+    networks:
+      - ecommerce-api-network
+  
+  postgres-order-microservice:
+    image: postgres:16
+    container_name: postgres-order-microservice
+    env_file: ./order-microservice/.env
+    networks:
+      - ecommerce-api-network
+    volumes:
+      - order_microservice_db:/var/lib/postgresql/data
+
   cloud-gateway:
     build:
       context: ./cloud-gateway
@@ -92,3 +116,4 @@ volumes:
   rabbitmq_data:
   auth_microservice_db:
   product_microservice_db:
+  order_microservice_db:
