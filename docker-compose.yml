@@ -97,6 +97,30 @@ services:
     volumes:
       - order_microservice_db:/var/lib/postgresql/data
 
+  cart-microservice:
+    build:
+      context: ./cart-microservice
+    image: cart-microservice
+    container_name: cart-microservice
+    depends_on:
+      - postgres-cart-microservice
+    env_file: ./cart-microservice/.env
+    volumes:
+      - ./cart-microservice:/app
+      
+    command: ["./mvnw", "spring-boot:run"]
+    networks:
+      - ecommerce-api-network
+  
+  postgres-cart-microservice:
+    image: postgres:16
+    container_name: postgres-cart-microservice
+    env_file: ./cart-microservice/.env
+    networks:
+      - ecommerce-api-network
+    volumes:
+      - cart_microservice_db:/var/lib/postgresql/data
+
   cloud-gateway:
     build:
       context: ./cloud-gateway
@@ -117,3 +141,4 @@ volumes:
   auth_microservice_db:
   product_microservice_db:
   order_microservice_db:
+  cart_microservice_db:
