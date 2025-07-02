@@ -1,5 +1,6 @@
 package com.leonmesquita.ecommerce.cart_microservice.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,6 +21,7 @@ public class CartItemModel {
 
     @ManyToOne
     @JoinColumn(name = "cartId", nullable = false)
+    @JsonIgnore
     private CartModel cart;
 
     @Column(nullable = false)
@@ -27,7 +29,4 @@ public class CartItemModel {
 
     @Column(nullable = false)
     private int amount;
-
-    @Column(nullable = false)
-    BigDecimal unitPrice;
 }

@@ -23,10 +23,13 @@ public class CartModel {
     private Long userId;
 
     @OneToMany(mappedBy = "cart")
-    @JsonIgnore
+//    @JsonIgnore
     private List<CartItemModel> items;
 
     @Column
-    private LocalDateTime creationDate;
+    private LocalDateTime creationDate = LocalDateTime.now();
+
+    @Column(nullable = false)
+    private boolean active = true;
 
 }
