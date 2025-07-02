@@ -32,4 +32,13 @@ public class CartController {
         String userEmail = jwt.getSubject();
         return ResponseEntity.status(HttpStatus.OK).body(cartService.findByUser(userEmail));
     }
+
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> removeItemFromCart(@AuthenticationPrincipal Jwt jwt, @PathVariable Long id) {
+        String userEmail = jwt.getSubject();
+        System.out.println(jwt);
+        cartService.removeItemFromCart(id, userEmail);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 }
