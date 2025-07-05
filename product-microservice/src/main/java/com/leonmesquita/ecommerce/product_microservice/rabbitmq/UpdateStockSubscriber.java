@@ -3,6 +3,7 @@ package com.leonmesquita.ecommerce.product_microservice.rabbitmq;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.leonmesquita.ecommerce.product_microservice.dtos.rabbitmq.Order;
 import com.leonmesquita.ecommerce.product_microservice.dtos.rabbitmq.OrderItem;
 import com.leonmesquita.ecommerce.product_microservice.models.ProductModel;
 import com.leonmesquita.ecommerce.product_microservice.services.ProductService;
@@ -27,7 +28,7 @@ public class UpdateStockSubscriber {
     public void receiveUptadeStockRequest(@Payload String payload) {
         var mapper = new ObjectMapper();
         try {
-            List<OrderItem> dto = mapper.readValue(payload, new com.fasterxml.jackson.core.type.TypeReference<List<OrderItem>>() {});
+            Order dto = mapper.readValue(payload, Order.class);
             productService.updateStock(dto);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e); // mensagem vai para DLQ

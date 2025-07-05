@@ -7,11 +7,12 @@ import com.leonmesquita.ecommerce.order_microservice.dtos.OrderDTO;
 import com.leonmesquita.ecommerce.order_microservice.dtos.feign.CartItemDTO;
 import com.leonmesquita.ecommerce.order_microservice.dtos.feign.CartResponseDTO;
 import com.leonmesquita.ecommerce.order_microservice.exceptions.GenericBadRequestException;
+import com.leonmesquita.ecommerce.order_microservice.exceptions.GenericNotFoundException;
 import com.leonmesquita.ecommerce.order_microservice.models.OrderItemModel;
 import com.leonmesquita.ecommerce.order_microservice.models.OrderModel;
 import com.leonmesquita.ecommerce.order_microservice.models.enums.OrderStatusEnum;
 import com.leonmesquita.ecommerce.order_microservice.rabbitmq.ClearCartPublisher;
-import com.leonmesquita.ecommerce.order_microservice.rabbitmq.UpdateStockPublisher;
+import com.leonmesquita.ecommerce.order_microservice.rabbitmq.ProductPublisher;
 import com.leonmesquita.ecommerce.order_microservice.repositories.OrderItemRepository;
 import com.leonmesquita.ecommerce.order_microservice.repositories.OrderRepository;
 import feign.FeignException;
@@ -38,7 +39,7 @@ public class OrderService {
     OrderItemRepository orderItemRepository;
 
     @Autowired
-    UpdateStockPublisher updateStockPublisher;
+    ProductPublisher productPublisher;
 
     @Autowired
     ProductsClient productsClient;
@@ -72,7 +73,7 @@ public class OrderService {
         orderModel.setStatus(OrderStatusEnum.CREATED);
 
         try {
-            updateStockPublisher.updateStock(orderItems);
+            productPublisher.updateStock(orderModel);
             clearCartPublisher.clearCart(cart.getId());
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
@@ -83,6 +84,12 @@ public class OrderService {
 
     public List<OrderModel> findAllUserOrders(Long userId) {
         return orderRepository.findAllByUserId(userId);
+    }
+
+    public OrderModel findById(Long id) {
+        return orderRepository.findById(id).orElseThrow(
+                () -> new GenericNotFoundException("Pedido não encontrado")
+        );
     }
 
     public CartResponseDTO cartsClientFindCart(Long id) {
@@ -97,6 +104,23 @@ public class OrderService {
             );
         }
     }
+
+    @Transactional
+    public OrderModel cancelOrder(Long orderId) {
+        OrderModel order = this.findById(orderId);
+        if (order.getStatus() != OrderStatusEnum.CREATED && order.getStatus() != OrderStatusEnum.PAID) {
+            throw new GenericBadRequestException("Não é possível cancelar este pedido");
+        }
+        order.setStatus(OrderStatusEnum.CANCELED);
+        try {
+            productPublisher.updateStock(order);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        return orderRepository.save(order);
+    }
+
+
 
     public void productsClientCheckStock(List<CartItemDTO> items) {
         try {

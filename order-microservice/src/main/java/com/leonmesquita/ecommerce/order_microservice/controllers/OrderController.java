@@ -33,4 +33,10 @@ public class OrderController {
         Long userId = jwt.getClaim("userId");
         return ResponseEntity.status(HttpStatus.OK).body(orderService.findAllUserOrders(userId));
     }
+
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @PostMapping("/{id}")
+    public ResponseEntity<OrderModel> cancelOrder(@PathVariable Long id) {
+        return ResponseEntity.status(HttpStatus.OK).body(orderService.cancelOrder(id));
+    }
 }

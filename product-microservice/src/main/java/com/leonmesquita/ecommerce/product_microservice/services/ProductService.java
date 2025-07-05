@@ -1,7 +1,9 @@
 package com.leonmesquita.ecommerce.product_microservice.services;
 
 import com.leonmesquita.ecommerce.product_microservice.dtos.ProductDTO;
+import com.leonmesquita.ecommerce.product_microservice.dtos.rabbitmq.Order;
 import com.leonmesquita.ecommerce.product_microservice.dtos.rabbitmq.OrderItem;
+import com.leonmesquita.ecommerce.product_microservice.dtos.rabbitmq.OrderStatusEnum;
 import com.leonmesquita.ecommerce.product_microservice.exceptions.GenericBadRequestException;
 import com.leonmesquita.ecommerce.product_microservice.exceptions.GenericNotFoundException;
 import com.leonmesquita.ecommerce.product_microservice.models.ProductModel;
@@ -13,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class ProductService {
@@ -44,13 +47,17 @@ public class ProductService {
         return productRepository.save(product);
     }
 
-    public void updateStock(List<OrderItem> dto) {
-        for (OrderItem orderItem : dto) {
+    public void updateStock(Order order) {
+        for (OrderItem orderItem : order.getItems()) {
             ProductModel product = this.findById(orderItem.getProductId());
-            if (orderItem.getAmount() > product.getStock()) {
-                throw new GenericBadRequestException("Quantidade comprada maior que o estoque disponível");
+            if (order.getStatus() == OrderStatusEnum.CANCELED) {
+                product.setStock(product.getStock() + orderItem.getAmount());
+            } else {
+                if (orderItem.getAmount() > product.getStock()) {
+                    throw new GenericBadRequestException("Quantidade comprada maior que o estoque disponível");
+                }
+                product.setStock(product.getStock() - orderItem.getAmount());
             }
-            product.setStock(product.getStock() - orderItem.getAmount());
             productRepository.save(product);
         }
     }

@@ -1,5 +1,6 @@
 package com.leonmesquita.ecommerce.order_microservice.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.leonmesquita.ecommerce.order_microservice.models.enums.OrderStatusEnum;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -33,6 +34,7 @@ public class OrderModel {
     private OrderStatusEnum status;
 
     @Column
-    private LocalDateTime creationDate;
+    @JsonIgnore
+    private LocalDateTime creationDate = LocalDateTime.now();
 
 }

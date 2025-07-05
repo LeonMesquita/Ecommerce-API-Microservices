@@ -1,7 +1,6 @@
-package com.leonmesquita.ecommerce.order_microservice.models.enums;
+package com.leonmesquita.ecommerce.product_microservice.dtos.rabbitmq;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 
 @Getter
