@@ -2,6 +2,12 @@ spring:
   application:
     name: auth-microservice
 
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    username: admin
+    password: admin
+
   config:
     import: "optional:file:.env[.properties]"
 
@@ -9,6 +15,12 @@ spring:
     url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
     username: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
+
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration: ${JWT_EXPIRATION}
+    refresh_expiration: ${JWT_REFRESH_EXPIRATION}
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -21,6 +33,10 @@ spring:
 
 server:
   port: 0
+
+mq:
+  queues:
+    create-cart: create-cart
 
 eureka:
   client:

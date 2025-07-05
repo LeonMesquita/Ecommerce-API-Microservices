@@ -24,7 +24,7 @@ services:
     networks:
       - ecommerce-api-network
 
-  clients:
+  auth-microservice:
     build:
       context: ./auth-microservice
     image: auth-microservice
@@ -32,6 +32,10 @@ services:
     depends_on:
       - postgres-auth-microservice
     env_file: ./auth-microservice/.env
+    volumes:
+      - ./auth-microservice:/app
+      
+    command: ["./mvnw", "spring-boot:run"]
     networks:
       - ecommerce-api-network
 
@@ -41,12 +45,88 @@ services:
     env_file: ./auth-microservice/.env
     networks:
       - ecommerce-api-network
+    volumes:
+      - auth_microservice_db:/var/lib/postgresql/data
+
+
+  product-microservice:
+    build:
+      context: ./product-microservice
+    image: product-microservice
+    container_name: product-microservice
+    depends_on:
+      - postgres-product-microservice
+    env_file: ./product-microservice/.env
+    volumes:
+      - ./product-microservice:/app
+      
+    command: ["./mvnw", "spring-boot:run"]
+    networks:
+      - ecommerce-api-network
+  
+  postgres-product-microservice:
+    image: postgres:16
+    container_name: postgres-product-microservice
+    env_file: ./product-microservice/.env
+    networks:
+      - ecommerce-api-network
+    volumes:
+      - product_microservice_db:/var/lib/postgresql/data
+
+  order-microservice:
+    build:
+      context: ./order-microservice
+    image: order-microservice
+    container_name: order-microservice
+    depends_on:
+      - postgres-order-microservice
+    env_file: ./order-microservice/.env
+    volumes:
+      - ./order-microservice:/app
+      
+    command: ["./mvnw", "spring-boot:run"]
+    networks:
+      - ecommerce-api-network
+  
+  postgres-order-microservice:
+    image: postgres:16
+    container_name: postgres-order-microservice
+    env_file: ./order-microservice/.env
+    networks:
+      - ecommerce-api-network
+    volumes:
+      - order_microservice_db:/var/lib/postgresql/data
+
+  cart-microservice:
+    build:
+      context: ./cart-microservice
+    image: cart-microservice
+    container_name: cart-microservice
+    depends_on:
+      - postgres-cart-microservice
+    env_file: ./cart-microservice/.env
+    volumes:
+      - ./cart-microservice:/app
+      
+    command: ["./mvnw", "spring-boot:run"]
+    networks:
+      - ecommerce-api-network
+  
+  postgres-cart-microservice:
+    image: postgres:16
+    container_name: postgres-cart-microservice
+    env_file: ./cart-microservice/.env
+    networks:
+      - ecommerce-api-network
+    volumes:
+      - cart_microservice_db:/var/lib/postgresql/data
 
   cloud-gateway:
     build:
       context: ./cloud-gateway
     image: cloud-gateway
     container_name: cloud-gateway
+    env_file: ./cloud-gateway/.env
     ports:
       - "8080:8080"
     networks:
@@ -58,3 +138,7 @@ networks:
   
 volumes:
   rabbitmq_data:
+  auth_microservice_db:
+  product_microservice_db:
+  order_microservice_db:
+  cart_microservice_db:
