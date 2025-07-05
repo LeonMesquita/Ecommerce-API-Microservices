@@ -39,6 +39,8 @@ mq:
   queues:
     create-cart: create-cart
     clear-cart: clear-cart
+    create-cart-dlq: create-cart.dlq
+    clear-cart-dlq: clear-cart.dlq
 
 eureka:
   client:

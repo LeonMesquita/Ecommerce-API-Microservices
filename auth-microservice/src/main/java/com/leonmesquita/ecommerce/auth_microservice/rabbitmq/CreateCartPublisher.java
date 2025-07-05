@@ -6,6 +6,7 @@ import com.leonmesquita.ecommerce.auth_microservice.dtos.rabbitmq.DataCartReques
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -13,12 +14,12 @@ public class CreateCartPublisher {
     @Autowired
     RabbitTemplate rabbitTemplate;
 
-    @Autowired
-    Queue queueCreateCart;
+    @Value("${mq.queues.create-cart}")
+    private String createCartQueue;
 
     public void createCart(DataCartRequestDTO data) throws JsonProcessingException  {
         var json = this.convertIntoJson(data);
-        rabbitTemplate.convertAndSend(queueCreateCart.getName(), json);
+        rabbitTemplate.convertAndSend(createCartQueue, json);
     }
 
     private String convertIntoJson(DataCartRequestDTO data) throws JsonProcessingException {

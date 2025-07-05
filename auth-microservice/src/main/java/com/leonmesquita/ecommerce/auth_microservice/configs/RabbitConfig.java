@@ -10,8 +10,4 @@ public class RabbitConfig {
     @Value("${mq.queues.create-cart}")
     private String createCartQueue;
 
-    @Bean
-    public Queue createCartQueue() {
-        return new Queue(createCartQueue, true);
-    }
 }

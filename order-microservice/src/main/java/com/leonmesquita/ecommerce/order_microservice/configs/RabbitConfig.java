@@ -13,13 +13,5 @@ public class RabbitConfig {
     @Value("${mq.queues.update-stock}")
     private String updateStockQueue;
 
-    @Bean
-    public Queue clearCartQueue() {
-        return new Queue(clearCartQueue, true);
-    }
-    @Bean
-    public Queue updateStockQueue() {
-        return new Queue(updateStockQueue, true);
-    }
 
 }

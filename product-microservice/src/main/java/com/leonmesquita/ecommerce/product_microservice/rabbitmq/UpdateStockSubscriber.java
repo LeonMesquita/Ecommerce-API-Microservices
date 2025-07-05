@@ -16,20 +16,21 @@ import java.util.List;
 
 @Component
 public class UpdateStockSubscriber {
-    @Value("${mq.queues.update-stock}")
-    private String createCartQueue;
 
     @Autowired
     ProductService productService;
 
-    @RabbitListener(queues = "update-stock")
+    @RabbitListener(
+            queues = "${mq.queues.update-stock}",
+            containerFactory = "rabbitListenerContainerFactory"
+    )
     public void receiveUptadeStockRequest(@Payload String payload) {
         var mapper = new ObjectMapper();
         try {
-            List<OrderItem> dto = mapper.readValue(payload, new TypeReference<List<OrderItem>>() {});
-           productService.updateStock(dto);
+            List<OrderItem> dto = mapper.readValue(payload, new com.fasterxml.jackson.core.type.TypeReference<List<OrderItem>>() {});
+            productService.updateStock(dto);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(e); // mensagem vai para DLQ
         }
     }
 }

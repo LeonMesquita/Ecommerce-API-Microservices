@@ -19,14 +19,14 @@ public class CreateCartSubscriber {
     @Autowired
     CartService cartService;
 
-    @RabbitListener(queues = "create-cart")
+    @RabbitListener(queues = "${mq.queues.create-cart}", containerFactory = "rabbitListenerContainerFactory")
     public void receiveCreateCartRequest(@Payload String payload) {
         try {
             var mapper = new ObjectMapper();
             CartDTO dto = mapper.readValue(payload, CartDTO.class);
             CartModel cart = cartService.createCart(dto);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 }

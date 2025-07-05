@@ -16,7 +16,7 @@ public class ClearCartSubscriber {
     CartService cartService;
 
 
-    @RabbitListener(queues = "clear-cart")
+    @RabbitListener(queues = "${mq.queues.clear-cart}", containerFactory = "rabbitListenerContainerFactory")
     public void receiveClearCartRequest(Long cartId) {
         cartService.clearCart(cartId);
     }

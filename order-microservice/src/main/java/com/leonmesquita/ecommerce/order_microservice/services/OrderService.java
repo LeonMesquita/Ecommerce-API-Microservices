@@ -6,6 +6,7 @@ import com.leonmesquita.ecommerce.order_microservice.clients.ProductsClient;
 import com.leonmesquita.ecommerce.order_microservice.dtos.OrderDTO;
 import com.leonmesquita.ecommerce.order_microservice.dtos.feign.CartItemDTO;
 import com.leonmesquita.ecommerce.order_microservice.dtos.feign.CartResponseDTO;
+import com.leonmesquita.ecommerce.order_microservice.exceptions.GenericBadRequestException;
 import com.leonmesquita.ecommerce.order_microservice.models.OrderItemModel;
 import com.leonmesquita.ecommerce.order_microservice.models.OrderModel;
 import com.leonmesquita.ecommerce.order_microservice.models.enums.OrderStatusEnum;
@@ -48,6 +49,9 @@ public class OrderService {
     @Transactional
     public OrderModel save(OrderDTO dto) {
         CartResponseDTO cart = this.cartsClientFindCart(dto.getCartId());
+        if (cart.getItems().isEmpty()) {
+            throw new GenericBadRequestException("O carrinho está vazio");
+        }
         this.productsClientCheckStock(cart.getItems());
         OrderModel orderModel = new OrderModel();
         BigDecimal totalPrice = BigDecimal.valueOf(0.0);
@@ -57,14 +61,14 @@ public class OrderService {
             BeanUtils.copyProperties(item, orderItemModel, "id");
             orderItemModel.setOrder(orderModel);
             orderItemRepository.save(orderItemModel);
-            orderItems.add(orderItemModel);
             totalPrice = totalPrice.add(item.getUnitPrice());
+            orderItems.add(orderItemModel);
         }
 
 
         orderModel.setUserId(cart.getUserId());
         orderModel.setTotal(totalPrice);
-//        orderModel.setItems(orderItems);
+        orderModel.setItems(orderItems);
         orderModel.setStatus(OrderStatusEnum.CREATED);
 
         try {

@@ -37,6 +37,7 @@ server:
 mq:
   queues:
     update-stock: update-stock
+    update-stock-dlq: update-stock.dlq
 
 eureka:
   client:

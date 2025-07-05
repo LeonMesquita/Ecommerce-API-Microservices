@@ -77,6 +77,7 @@ public class CartService {
     }
 
 
+    @Transactional
     public CartModel addItemsToCart(Long id, CartItemDTO dto) {
             UserResponseDTO user = this.usersClientFindUser(id);
             ProductResponseDTO product = this.productsClientFindProduct(dto.getProductId());
@@ -88,8 +89,9 @@ public class CartService {
             BeanUtils.copyProperties(dto, cartItemModel);
             cartItemModel.setUnitPrice(product.getPrice());
             cartItemModel.setCart(cart);
+            cart.getItems().add(cartItemModel);
             cartItemRepository.save(cartItemModel);
-            return cart;
+            return cartRepository.save(cart);
     }
     @Transactional
     public CartModel findByUser(Long id) {
