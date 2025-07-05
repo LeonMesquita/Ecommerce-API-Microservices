@@ -23,7 +23,6 @@ public class CartModel {
     private Long userId;
 
     @OneToMany(mappedBy = "cart")
-//    @JsonIgnore
     private List<CartItemModel> items;
 
     @Column

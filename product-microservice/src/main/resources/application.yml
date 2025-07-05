@@ -2,6 +2,12 @@ spring:
   application:
     name: product-microservice
 
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    username: admin
+    password: admin
+
   config:
     import: "optional:file:.env[.properties]"
 
@@ -27,6 +33,10 @@ spring:
 
 server:
   port: 0
+
+mq:
+  queues:
+    update-stock: update-stock
 
 eureka:
   client:

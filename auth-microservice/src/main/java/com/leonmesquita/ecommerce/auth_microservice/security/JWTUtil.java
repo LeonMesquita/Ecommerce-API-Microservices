@@ -26,13 +26,14 @@ public class JWTUtil {
     @Value("${spring.jwt.refresh_expiration}")
     private Integer refreshTokenExpirationHour;
 
-    public String generateToken(String email, List<String> roles, Integer expiration) {
+    public String generateToken(String email, List<String> roles, Integer expiration, Long userId) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
             return JWT.create()
                     .withIssuer("auth-api")
                     .withSubject(email)
-                    .withClaim("roles", roles) // 👈 aqui estão os perfis
+                    .withClaim("roles", roles)
+                    .withClaim("userId", userId)
                     .withExpiresAt(generateExpiration(expiration))
                     .sign(algorithm);
         } catch (JWTCreationException exception) {

@@ -85,7 +85,11 @@ public class AuthService {
         );
     }
 
-
+    public UserModel findById(Long id) {
+        return userRepository.findById(id).orElseThrow(
+                () -> new GenericNotFoundException("Usuário com o email " + id + " não encontrado")
+        );
+    }
 
     public TokenResponseDTO login(LoginDTO dto) {
         UsernamePasswordAuthenticationToken authToken =
@@ -96,8 +100,8 @@ public class AuthService {
                 .stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
-        String accessToken = jwtUtil.generateToken(user.getUsername(), roles, jwtUtil.getTokenExpirationHour());
-        String refreshToken = jwtUtil.generateToken(user.getUsername(), roles, jwtUtil.getRefreshTokenExpirationHour());
+        String accessToken = jwtUtil.generateToken(user.getUsername(), roles, jwtUtil.getTokenExpirationHour(), user.getUserId());
+        String refreshToken = jwtUtil.generateToken(user.getUsername(), roles, jwtUtil.getRefreshTokenExpirationHour(), user.getUserId());
 
         return new TokenResponseDTO(accessToken, refreshToken);
     }

@@ -1,6 +1,7 @@
 package com.leonmesquita.ecommerce.product_microservice.controllers;
 
 import com.leonmesquita.ecommerce.product_microservice.dtos.ProductDTO;
+import com.leonmesquita.ecommerce.product_microservice.dtos.rabbitmq.OrderItem;
 import com.leonmesquita.ecommerce.product_microservice.models.ProductModel;
 import com.leonmesquita.ecommerce.product_microservice.services.ProductService;
 import jakarta.validation.Valid;
@@ -12,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/products")
@@ -46,6 +49,20 @@ public class ProductController {
     @PutMapping("/{id}")
     public ResponseEntity<ProductModel> updateProduct(@PathVariable Long id, @RequestBody @Valid ProductDTO body) {
         return ResponseEntity.ok(productService.update(id, body));
+    }
+
+//    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+//    @PutMapping("/stock")
+//    public ResponseEntity<Void> updateProductStock(@RequestBody @Valid List<OrderItem> body) {
+//        productService.updateStock(body);
+//        return ResponseEntity.status(HttpStatus.OK).build();
+//    }
+
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @PutMapping("/stock")
+    public ResponseEntity<Void> checkProductStock(@RequestBody @Valid List<OrderItem> body) {
+        productService.checkStockAvailable(body);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")

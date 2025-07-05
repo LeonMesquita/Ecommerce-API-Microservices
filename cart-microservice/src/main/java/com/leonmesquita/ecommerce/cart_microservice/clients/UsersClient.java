@@ -10,4 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface UsersClient {
     @GetMapping("/user/{email}")
     ResponseEntity<UserResponseDTO> getUserByEmail(@RequestParam String email);
+
+    @GetMapping("/user/{id}")
+    ResponseEntity<UserResponseDTO> getUserById(@RequestParam Long id);
 }

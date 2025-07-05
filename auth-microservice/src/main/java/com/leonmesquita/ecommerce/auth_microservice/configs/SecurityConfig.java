@@ -4,6 +4,7 @@ import com.leonmesquita.ecommerce.auth_microservice.exceptions.CustomAccessDenie
 import com.leonmesquita.ecommerce.auth_microservice.exceptions.CustomAuthenticationEntryPoint;
 import com.leonmesquita.ecommerce.auth_microservice.security.JWTAuthorizationFilter;
 import com.leonmesquita.ecommerce.auth_microservice.security.JWTUtil;
+import com.leonmesquita.ecommerce.auth_microservice.services.UserDetailServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -43,14 +44,14 @@ public class SecurityConfig {
     private JWTUtil jwtUtil;
 
     @Autowired
-    private UserDetailsService userDetailsService;
+    private UserDetailServiceImpl userDetailsService;
 
-    // Define as rotas que serão públicas
+
     private static final String[] PUBLIC_MATCHERS = {
             "/**"
     };
 
-    // Define as rotas POST que serão públicas
+
     private static final String[] PUBLIC_MATCHERS_POST = {
             "/auth/**",
             "/login",

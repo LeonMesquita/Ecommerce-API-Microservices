@@ -10,8 +10,16 @@ public class RabbitConfig {
     @Value("${mq.queues.create-cart}")
     private String createCartQueue;
 
+    @Value("${mq.queues.clear-cart}")
+    private String clearCartQueue;
+
     @Bean
     public Queue createCartQueue() {
         return new Queue(createCartQueue, true);
+    }
+
+    @Bean
+    public Queue clearCartQueue() {
+        return new Queue(clearCartQueue, true);
     }
 }

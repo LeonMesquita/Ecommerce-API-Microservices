@@ -15,6 +15,7 @@ public class CreateCartSubscriber {
     @Value("${mq.queues.create-cart}")
     private String createCartQueue;
 
+
     @Autowired
     CartService cartService;
 

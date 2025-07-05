@@ -4,6 +4,8 @@ import com.leonmesquita.ecommerce.cart_microservice.clients.ProductsClient;
 import com.leonmesquita.ecommerce.cart_microservice.clients.UsersClient;
 import com.leonmesquita.ecommerce.cart_microservice.dtos.CartDTO;
 import com.leonmesquita.ecommerce.cart_microservice.dtos.CartItemDTO;
+import com.leonmesquita.ecommerce.cart_microservice.dtos.feign.CartItemResponseDTO;
+import com.leonmesquita.ecommerce.cart_microservice.dtos.feign.CartResponseDTO;
 import com.leonmesquita.ecommerce.cart_microservice.dtos.feign.ProductResponseDTO;
 import com.leonmesquita.ecommerce.cart_microservice.dtos.feign.UserResponseDTO;
 import com.leonmesquita.ecommerce.cart_microservice.exceptions.GenericBadRequestException;
@@ -22,6 +24,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -39,9 +43,9 @@ public class CartService {
     ProductsClient productsClient;
 
 
-    public UserResponseDTO usersClientFindUser(String email) {
+    public UserResponseDTO usersClientFindUser(Long id) {
         try {
-            return usersClient.getUserByEmail(email).getBody();
+            return usersClient.getUserById(id).getBody();
         } catch (FeignException e) {
             HttpStatus status = HttpStatus.resolve(e.status());
             String message = e.contentUTF8();
@@ -73,8 +77,8 @@ public class CartService {
     }
 
 
-    public CartModel addItemsToCart(String userEmail, CartItemDTO dto) {
-            UserResponseDTO user = this.usersClientFindUser(userEmail);
+    public CartModel addItemsToCart(Long id, CartItemDTO dto) {
+            UserResponseDTO user = this.usersClientFindUser(id);
             ProductResponseDTO product = this.productsClientFindProduct(dto.getProductId());
             if (dto.getAmount() > product.getStock()) {
                 throw new GenericBadRequestException("Quantidade de itens não pode exceder o estoque");
@@ -82,21 +86,27 @@ public class CartService {
             CartModel cart = this.findByUserId(user.getId());
             CartItemModel cartItemModel = new CartItemModel();
             BeanUtils.copyProperties(dto, cartItemModel);
+            cartItemModel.setUnitPrice(product.getPrice());
             cartItemModel.setCart(cart);
             cartItemRepository.save(cartItemModel);
             return cart;
     }
     @Transactional
-    public CartModel findByUser(String userEmail) {
-        try {
-            ResponseEntity<UserResponseDTO> user = usersClient.getUserByEmail(userEmail);
-            return cartRepository.findByUserId(user.getBody().getId()).orElseThrow(
-                    () -> new GenericNotFoundException("Carrinho não encontrado")
-            );
+    public CartModel findByUser(Long id) {
+        UserResponseDTO user = this.usersClientFindUser(id);
 
-        } catch (FeignException.FeignClientException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente não encontrado!");
-        }
+        return cartRepository.findByUserId(user.getId()).orElseThrow(
+                () -> new GenericNotFoundException("Carrinho não encontrado")
+        );
+    }
+
+    @Transactional
+    public CartModel findById(Long id) {
+        CartModel cart = cartRepository.findById(id).orElseThrow(
+                () -> new GenericNotFoundException("Carrinho não encontrado")
+        );
+        UserResponseDTO user = this.usersClientFindUser(cart.getUserId());
+        return cart;
     }
 
     @Transactional
@@ -107,16 +117,46 @@ public class CartService {
     }
 
     @Transactional
-    public void removeItemFromCart(Long id, String userEmail) {
+    public void removeItemFromCart(Long id, Long userId) {
         CartItemModel cartItem = cartItemRepository.findById(id).orElseThrow(
                 () -> new GenericNotFoundException("Item não encontrado")
         );
-        UserResponseDTO user = this.usersClientFindUser(userEmail);
+        UserResponseDTO user = this.usersClientFindUser(userId);
 
         if (!Objects.equals(user.getId(), cartItem.getCart().getUserId())) {
             throw new GenericForbiddenException("Usuário não possui autorização");
         }
 
         cartItemRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void clearCart(Long cartId) {
+        CartModel cart = this.findById(cartId);
+        for (CartItemModel item : cart.getItems()) {
+            cartItemRepository.deleteById(item.getId());
+        }
+    }
+
+    public CartResponseDTO toResponseDTO(CartModel cart) {
+        CartResponseDTO dto = new CartResponseDTO();
+        dto.setId(cart.getId());
+        dto.setUserId(cart.getUserId());
+        dto.setCreationDate(cart.getCreationDate());
+        dto.setActive(cart.isActive());
+
+        List<CartItemResponseDTO> itemDTOs = cart.getItems() != null
+                ? cart.getItems().stream().map(item -> {
+            CartItemResponseDTO itemDTO = new CartItemResponseDTO();
+            itemDTO.setId(item.getId());
+            itemDTO.setProductId(item.getProductId());
+            itemDTO.setAmount(item.getAmount());
+            itemDTO.setUnitPrice(item.getUnitPrice());
+            return itemDTO;
+        }).toList()
+                : new ArrayList<>();
+
+        dto.setItems(itemDTOs);
+        return dto;
     }
 }

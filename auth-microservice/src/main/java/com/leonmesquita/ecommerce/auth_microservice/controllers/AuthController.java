@@ -29,8 +29,13 @@ public class AuthController {
         return ResponseEntity.ok(authService.login(loginDTO));
     }
 
-    @GetMapping("/user/{email}")
-    public ResponseEntity<UserModel> getUserByEmail(@PathVariable  String email) {
+    @GetMapping("/user")
+    public ResponseEntity<UserModel> getUserByEmail(@RequestParam  String email) {
         return ResponseEntity.ok(authService.findByEmail(email));
+    }
+
+    @GetMapping("/user/{id}")
+    public ResponseEntity<UserModel> getUserById(@PathVariable  Long id) {
+        return ResponseEntity.ok(authService.findById(id));
     }
 }

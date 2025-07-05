@@ -41,6 +41,10 @@ public class UserSpringSecurity implements UserDetails {
         return email;
     }
 
+    public Long getUserId() {
+        return id;
+    }
+
     @Override
     public boolean isAccountNonExpired() {
         return UserDetails.super.isAccountNonExpired();

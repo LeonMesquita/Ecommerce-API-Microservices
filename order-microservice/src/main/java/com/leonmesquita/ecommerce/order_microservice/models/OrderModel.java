@@ -23,8 +23,8 @@ public class OrderModel {
     @Column(nullable = false)
     private Long userId;
 
-//    @Column
-//    private List<OrderItemModel> items;
+    @OneToMany(mappedBy = "order")
+    private List<OrderItemModel> items;
 
     @Column
     private BigDecimal total;

@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "order_item")
+@Table(name = "cart_item")
 public class CartItemModel {
 
     @Id
@@ -29,4 +29,7 @@ public class CartItemModel {
 
     @Column(nullable = false)
     private int amount;
+
+    @Column(nullable = false)
+    private BigDecimal unitPrice;
 }

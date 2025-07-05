@@ -1,6 +1,7 @@
 package com.leonmesquita.ecommerce.cart_microservice.controllers;
 
 import com.leonmesquita.ecommerce.cart_microservice.dtos.CartItemDTO;
+import com.leonmesquita.ecommerce.cart_microservice.dtos.feign.CartResponseDTO;
 import com.leonmesquita.ecommerce.cart_microservice.dtos.feign.UserResponseDTO;
 import com.leonmesquita.ecommerce.cart_microservice.models.CartModel;
 import com.leonmesquita.ecommerce.cart_microservice.services.CartService;
@@ -22,23 +23,31 @@ public class CartController {
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @PostMapping
     public ResponseEntity<CartModel> addItemToCart(@AuthenticationPrincipal Jwt jwt, @RequestBody @Valid CartItemDTO body) {
-        String userEmail = jwt.getSubject();
-        return ResponseEntity.status(HttpStatus.OK).body(cartService.addItemsToCart(userEmail, body));
+        Long userId = jwt.getClaim("userId");
+        return ResponseEntity.status(HttpStatus.OK).body(cartService.addItemsToCart(userId, body));
     }
 
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @GetMapping
     public ResponseEntity<CartModel> getUserCart(@AuthenticationPrincipal Jwt jwt) {
-        String userEmail = jwt.getSubject();
-        return ResponseEntity.status(HttpStatus.OK).body(cartService.findByUser(userEmail));
+        Long userId = jwt.getClaim("userId");
+        return ResponseEntity.status(HttpStatus.OK).body(cartService.findByUser(userId));
+    }
+
+
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @GetMapping("/{id}")
+    public ResponseEntity<CartResponseDTO> getCartById(@PathVariable Long id) {
+        CartModel cart = cartService.findById(id);
+        CartResponseDTO dto = cartService.toResponseDTO(cart);
+        return ResponseEntity.ok(dto);
     }
 
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> removeItemFromCart(@AuthenticationPrincipal Jwt jwt, @PathVariable Long id) {
-        String userEmail = jwt.getSubject();
-        System.out.println(jwt);
-        cartService.removeItemFromCart(id, userEmail);
+        Long userId = jwt.getClaim("userId");
+        cartService.removeItemFromCart(id, userId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

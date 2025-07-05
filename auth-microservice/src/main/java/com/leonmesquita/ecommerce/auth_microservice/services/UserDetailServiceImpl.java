@@ -18,9 +18,9 @@ public class UserDetailServiceImpl implements UserDetailsService {
 
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws GenericNotFoundException {
-        UserModel user = this.userRepository.findByEmail(username).orElseThrow(
-                () -> new GenericNotFoundException("Usuário não encontrado: " + username)
+    public UserDetails loadUserByUsername(String email) throws GenericNotFoundException {
+        UserModel user = this.userRepository.findByEmail(email).orElseThrow(
+                () -> new GenericNotFoundException("Usuário não encontrado: " + email)
         );
 
         return new UserSpringSecurity(user.getId(), user.getName(), user.getPassword(), user.getEmail(), user.getProfiles());

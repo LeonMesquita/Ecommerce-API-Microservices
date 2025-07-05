@@ -38,6 +38,7 @@ server:
 mq:
   queues:
     create-cart: create-cart
+    clear-cart: clear-cart
 
 eureka:
   client:
