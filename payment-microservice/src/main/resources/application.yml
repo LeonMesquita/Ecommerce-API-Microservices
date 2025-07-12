@@ -1,6 +1,6 @@
 spring:
   application:
-    name: auth-microservice
+    name: payment-microservice
 
   rabbitmq:
     host: rabbitmq
@@ -11,10 +11,10 @@ spring:
   config:
     import: "optional:file:.env[.properties]"
 
-  datasource:
-    url: jdbc:postgresql://postgres-auth-microservice:5432/auth-microservice-db
-    username: postgres
-    password: postgres
+#  datasource:
+#    url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+#    username: ${POSTGRES_USER}
+#    password: ${POSTGRES_PASSWORD}
 
   jwt:
     secret: ${JWT_SECRET}
@@ -34,9 +34,10 @@ spring:
 server:
   port: 0
 
+
 mq:
   queues:
-    create-cart: create-cart
+    update-status: update-status
 
 eureka:
   client:

@@ -23,6 +23,7 @@ public class CloudGatewayApplication {
 				.route(r -> r.path("/products/**").uri("lb://product-microservice"))
 				.route(r -> r.path("/carts/**").uri("lb://cart-microservice"))
 				.route(r -> r.path("/orders/**").uri("lb://order-microservice"))
+				.route(r -> r.path("/payments/**").uri("lb://payment-microservice"))
 				.build();
 	}
 

@@ -11,6 +11,7 @@ import com.leonmesquita.ecommerce.order_microservice.exceptions.GenericNotFoundE
 import com.leonmesquita.ecommerce.order_microservice.models.OrderItemModel;
 import com.leonmesquita.ecommerce.order_microservice.models.OrderModel;
 import com.leonmesquita.ecommerce.order_microservice.models.enums.OrderStatusEnum;
+import com.leonmesquita.ecommerce.order_microservice.models.enums.PaymentStatusEnum;
 import com.leonmesquita.ecommerce.order_microservice.rabbitmq.ClearCartPublisher;
 import com.leonmesquita.ecommerce.order_microservice.rabbitmq.ProductPublisher;
 import com.leonmesquita.ecommerce.order_microservice.repositories.OrderItemRepository;
@@ -118,6 +119,18 @@ public class OrderService {
             throw new RuntimeException(e);
         }
         return orderRepository.save(order);
+    }
+
+
+    @Transactional
+    public void approveOrder(Long orderId, PaymentStatusEnum status) {
+        OrderModel order = this.findById(orderId);
+        if (status == PaymentStatusEnum.APPROVED) {
+            order.setStatus(OrderStatusEnum.PAID);
+            orderRepository.save(order);
+        } else {
+            throw new GenericBadRequestException("O status de pagamento precisa estar aprovado");
+        }
     }
 
 

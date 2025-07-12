@@ -42,7 +42,11 @@ services:
   postgres-auth-microservice:
     image: postgres:16
     container_name: postgres-auth-microservice
-    env_file: ./auth-microservice/.env
+    # env_file: ./auth-microservice/.env
+    environment:
+      POSTGRES_DB: auth-microservice-db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     networks:
       - ecommerce-api-network
     volumes:
@@ -67,7 +71,11 @@ services:
   postgres-product-microservice:
     image: postgres:16
     container_name: postgres-product-microservice
-    env_file: ./product-microservice/.env
+    # env_file: ./product-microservice/.env
+    environment:
+      POSTGRES_DB: product-microservice-db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     networks:
       - ecommerce-api-network
     volumes:
@@ -91,7 +99,11 @@ services:
   postgres-order-microservice:
     image: postgres:16
     container_name: postgres-order-microservice
-    env_file: ./order-microservice/.env
+    # env_file: ./order-microservice/.env
+    environment:
+      POSTGRES_DB: order-microservice-db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     networks:
       - ecommerce-api-network
     volumes:
@@ -115,11 +127,39 @@ services:
   postgres-cart-microservice:
     image: postgres:16
     container_name: postgres-cart-microservice
-    env_file: ./cart-microservice/.env
+    # env_file: ./cart-microservice/.env
+    environment:
+      POSTGRES_DB: cart-microservice-db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     networks:
       - ecommerce-api-network
     volumes:
       - cart_microservice_db:/var/lib/postgresql/data
+
+  payment-microservice:
+    build:
+      context: ./payment-microservice
+    image: payment-microservice
+    container_name: payment-microservice
+    # depends_on:
+    #   - postgres-payment-microservice
+    env_file: ./payment-microservice/.env
+    volumes:
+      - ./payment-microservice:/app
+      
+    command: ["./mvnw", "spring-boot:run"]
+    networks:
+      - ecommerce-api-network
+
+  # postgres-payment-microservice:
+  #   image: postgres:16
+  #   container_name: postgres-payment-microservice
+  #   env_file: ./payment-microservice/.env
+  #   networks:
+  #     - ecommerce-api-network
+  #   volumes:
+  #     - payment_microservice_db:/var/lib/postgresql/data
 
   cloud-gateway:
     build:
@@ -142,3 +182,4 @@ volumes:
   product_microservice_db:
   order_microservice_db:
   cart_microservice_db:
+  payment_microservice_db:
