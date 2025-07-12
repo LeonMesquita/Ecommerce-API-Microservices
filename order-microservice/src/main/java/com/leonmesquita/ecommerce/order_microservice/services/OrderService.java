@@ -87,11 +87,13 @@ public class OrderService {
         return orderRepository.findAllByUserId(userId);
     }
 
+
     public OrderModel findById(Long id) {
         return orderRepository.findById(id).orElseThrow(
                 () -> new GenericNotFoundException("Pedido não encontrado")
         );
     }
+
 
     public CartResponseDTO cartsClientFindCart(Long id) {
         try {

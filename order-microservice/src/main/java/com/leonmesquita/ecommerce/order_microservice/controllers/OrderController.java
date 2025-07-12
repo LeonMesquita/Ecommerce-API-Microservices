@@ -39,4 +39,10 @@ public class OrderController {
     public ResponseEntity<OrderModel> cancelOrder(@PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(orderService.cancelOrder(id));
     }
+
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @GetMapping("/{id}")
+    public ResponseEntity<OrderModel> getOrderById(@PathVariable Long id) {
+        return ResponseEntity.status(HttpStatus.OK).body(orderService.findById(id));
+    }
 }
